@@ -70,7 +70,7 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <ImageBackground
+        {/* <ImageBackground
           source={require('./assets/kompas.png')}
           style={[
             styles.image,
@@ -88,7 +88,7 @@ class App extends Component {
               style={{marginBottom: '45%', resizeMode: 'contain', flex: 0.7}}
             />
           </View>
-        </ImageBackground>
+        </ImageBackground> */}
       </View>
     );
   }
