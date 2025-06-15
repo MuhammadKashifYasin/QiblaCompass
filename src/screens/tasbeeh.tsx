@@ -1,4 +1,4 @@
-import react, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,28 +6,54 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Modal,
-  FlatList,
 } from 'react-native';
-import {Header} from '../components/header';
+import { Header } from '../components/header';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {useRoute} from '@react-navigation/native';
+import Tts from 'react-native-tts';
 import SoundPlayer from 'react-native-sound-player';
+import { useSelector } from 'react-redux';
 
-const TasbeehScreen = ({navigation}) => {
-  const [count, setCount] = useState(0);
-  const [ziker, setZiker] = useState(
-    'لآ اِلَهَ اِلّا اللّهُ مُحَمَّدٌ رَسُوُل اللّهِ',
+const TasbeehScreen: React.FC<TasbeehScreenProps> = ({ navigation }) => {
+  const getSelectedZiker = useSelector((state:any)=> state?.user?.selectedZiker)
+  const [count, setCount] = useState<number>(0);
+  const [ziker, setZiker] = useState<string>(
+    'لآ اِلَهَ اِلّا اللّهُ مُحَمَّدٌ رَسُوُل اللّهِ'
   );
-  const [amount, setAmount] = useState('5000');
-  const [isMuted, setIsMuted] = useState(false);
+  const [amount, setAmount] = useState<string>('5000');
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
+  useEffect(() => {
+    if (getSelectedZiker) {
+      setZiker(getSelectedZiker.ziker || ziker);
+      setAmount(getSelectedZiker.amount || amount);
+    }
+  }, [getSelectedZiker]);
+
+  const toggleMute = () => setIsMuted((prev) => !prev);
+
+  useEffect(() => {
+    Tts.setDefaultLanguage('ar-SA')
+      .then(() => console.log('Language set to Arabic'))
+      .catch((error) => console.error('Error setting language:', error));
+  }, []);
+
+  const HandleTextSpeech = () => {
+    if (!isMuted) {
+      Tts.stop();
+      Tts.speak(ziker);
+      // , {
+      //   androidParams: {
+      //     KEY_PARAM_PAN: -1,
+      //     KEY_PARAM_VOLUME: 0.5,
+      //     KEY_PARAM_STREAM: 'STREAM_MUSIC',
+      //   },
+      // }
+    }
+  }
 
   const Icons = [
     {
@@ -39,7 +65,7 @@ const TasbeehScreen = ({navigation}) => {
     },
     {
       icon: require('../assets/images/voice.png'),
-      // press: () => setSoundModalVisible(true),
+      press: () => HandleTextSpeech()
     },
     {
       icon: require('../assets/images/repeat.png'),
@@ -47,17 +73,21 @@ const TasbeehScreen = ({navigation}) => {
     },
   ];
 
-  const route = useRoute(); // Initialize route
-
-  useEffect(() => {
-    if (route.params) {
-      const {ziker: selectedZiker, amount: selectedAmount} = route.params;
-      setZiker(selectedZiker); // Set selected ziker
-      setAmount(selectedAmount); // Set selected amount
+  const HandlePress = () => {
+    try {
+     if(!isMuted){
+      SoundPlayer.playAsset(require("../assets/sounds/beep1.mp3"));
+     }
+      setCount(count + 1)
+    } catch (e) {
+      console.log(`cannot play the sound file`, e);
     }
-  }, [route.params]);
+
+
+  }
+
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.screen}>
       <Header title="Tasbeeh" />
       <ScrollView>
         <View style={styles.arabicView}>
@@ -77,28 +107,24 @@ const TasbeehScreen = ({navigation}) => {
             <Text style={styles.tasbeehText}>{count}</Text>
           </View>
           <TouchableOpacity
-            onPress={() => {
-              setCount(count + 1);
-            }}
+            onPress={HandlePress}
             style={styles.plusView}>
             <Text style={styles.plus}>+</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.iconsView}>
-          {Icons.map((item, index) => {
-            return (
-              <TouchableOpacity
-                onPress={item.press}
-                style={[styles.iconView, item.style]}
-                key={index}>
-                <Image
-                  style={styles.icon}
-                  source={item.icon}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            );
-          })}
+          {Icons.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={item.press}
+              style={[styles.iconView, item.style]}>
+              <Image
+                style={styles.icon}
+                source={item.icon}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -108,6 +134,9 @@ const TasbeehScreen = ({navigation}) => {
 export default TasbeehScreen;
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   arabicView: {
     width: wp(100),
     alignItems: 'center',
@@ -147,7 +176,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: '#000',
     fontWeight: 'bold',
-    // padding: 10,
   },
   tasbeehViewMain: {
     width: wp(100),
@@ -206,50 +234,10 @@ const styles = StyleSheet.create({
     color: '#000',
     padding: 10,
   },
-  modalView: {
-    width: wp(90),
-    backgroundColor: '#fff',
-    alignSelf: 'center',
-    padding: 15,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-    borderRadius: 15,
-    marginVertical: hp(1),
-  },
-  soundItem: {
-    width: wp(80),
-    backgroundColor: '#BBECC9',
-    alignSelf: 'center',
-    padding: 10,
-    marginVertical: hp(0.5),
-    borderRadius: 10,
-  },
-  soundItemText: {
-    fontSize: 15,
-    color: '#000',
-  },
-  closeButton: {
-    width: wp(80),
-    backgroundColor: '#046920',
-    alignSelf: 'center',
-    padding: 10,
-    marginVertical: hp(1),
-    borderRadius: 10,
-  },
-  closeButtonText: {
-    fontSize: 15,
-    color: '#fff',
-  },
   iconMuted: {
-    backgroundColor: '#046920', // Green background for muted icon
+    backgroundColor: '#046920',
   },
   iconUnmuted: {
-    backgroundColor: '#FFF', // White background for unmuted icon
+    backgroundColor: '#FFF',
   },
 });

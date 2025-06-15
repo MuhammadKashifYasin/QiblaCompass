@@ -1,64 +1,64 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Image, ImageBackground, StyleSheet, View} from 'react-native';
 import CompassHeading from 'react-native-compass-heading';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request} from 'react-native-permissions';
 
-class App extends Component {
-  state = {
-    compassHeading: 0,
-    qiblad: 0,
-  };
+const QiblaScreen = () => {
+  const [compassHeading, setCompassHeading] = useState(0);
+  const [qiblad, setQiblad] = useState(0);
 
-  componentDidMount() {
-    this.getLocation();
+  useEffect(() => {
+    requestLocationPermission();
     const degree_update_rate = 3;
+console.log('start');
 
-    // Request permissions
-    this.requestLocationPermission();
 
     CompassHeading.start(degree_update_rate, degree => {
-      this.setState({compassHeading: degree});
+      console.log('middle');
+      
+      setCompassHeading(degree);
     });
+    console.log('nd');
+    
 
     return () => {
       CompassHeading.stop();
     };
-  }
+  }, []);
 
-  requestLocationPermission = async () => {
+  const requestLocationPermission = async () => {
     try {
       const result = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
       if (result === 'granted') {
-        console.log('Location permission granted');
+        getLocation();
       }
     } catch (error) {
       console.error('Error requesting location permission:', error);
     }
   };
 
-  calculate = (latitude, longitude) => {
+  const calculateQiblaDirection = (latitude, longitude) => {
     const PI = Math.PI;
-    let latk = (21.4225 * PI) / 180.0;
-    let longk = (39.8264 * PI) / 180.0;
-    let phi = (latitude * PI) / 180.0;
-    let lambda = (longitude * PI) / 180.0;
-    let qiblad =
+    const latk = (21.4225 * PI) / 180.0;
+    const longk = (39.8264 * PI) / 180.0;
+    const phi = (latitude * PI) / 180.0;
+    const lambda = (longitude * PI) / 180.0;
+    const calculatedQiblad =
       (180.0 / PI) *
       Math.atan2(
         Math.sin(longk - lambda),
         Math.cos(phi) * Math.tan(latk) -
           Math.sin(phi) * Math.cos(longk - lambda),
       );
-    this.setState({qiblad});
+    setQiblad(calculatedQiblad);
   };
 
-  getLocation = () => {
+  const getLocation = () => {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        console.log('Location:', latitude, longitude);
-        this.calculate(latitude, longitude);
+        calculateQiblaDirection(latitude, longitude);
       },
       error => {
         console.error('Error getting current location:', error);
@@ -67,36 +67,34 @@ class App extends Component {
     );
   };
 
-  render() {
-    return (
-      <View style={styles.container}>
-        {/* <ImageBackground
-          source={require('./assets/kompas.png')}
-          style={[
-            styles.image,
-            {transform: [{rotate: `${360 - this.state.compassHeading}deg`}]},
-          ]}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              transform: [{rotate: `${this.state.qiblad}deg`}],
-            }}>
-            <Image
-              source={require('./assets/kakbah.png')}
-              style={{marginBottom: '45%', resizeMode: 'contain', flex: 0.7}}
-            />
-          </View>
-        </ImageBackground> */}
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.container}>
+      <ImageBackground
+        source={require('../assets/images/compass.jpeg')}
+        style={[
+          styles.image,
+          {transform: [{rotate: `${360 - compassHeading}deg`}]},
+        ]}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: [{rotate: `${qiblad}deg`}],
+          }}>
+          <Image
+            source={require('../assets/images/kabah.jpeg')}
+            style={{marginBottom: '45%', resizeMode: 'contain', flex: 0.7}}
+          />
+        </View>
+      </ImageBackground>
+    </View>
+  );
+};
 
-export default App;
+export default QiblaScreen;
 
 const styles = StyleSheet.create({
-  image: {width: '90%', flex: 0.5, resizeMode: 'contain', alignSelf: 'center'},
-  container: {backgroundColor: '#fff', flex: 1},
+  image: {width: '90%', flex: 0.5, resizeMode: 'contain',},
+  container: {alignItems:'center',justifyContent:'center', flex: 1},
 });

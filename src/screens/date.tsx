@@ -1,4 +1,4 @@
-import react, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {Header} from '../components/header';
 import {
@@ -8,7 +8,7 @@ import {
 import {Calendar} from 'react-native-calendars';
 import moment from 'moment-hijri';
 
-const DateScreen = ({navigation}) => {
+const DateScreen = () => {
   const [currentHijriDate, setCurrentHijriDate] = useState('');
 
   useEffect(() => {
@@ -22,17 +22,17 @@ const DateScreen = ({navigation}) => {
       hijri: '1 muharram, 1444',
     },
     {
-      title: 'Islamic New Year',
+      title: 'Eid al-Fitr',
       gregorian: '18 july, 2023',
       hijri: '1 muharram, 1444',
     },
     {
-      title: 'Islamic New Year',
+      title: 'Eid al-Adha',
       gregorian: '18 july, 2023',
       hijri: '1 muharram, 1444',
     },
   ];
-  const formatDate = date => {
+  const formatDate = (date:any) => {
     const options = {day: '2-digit', month: 'long', year: 'numeric'};
     return date.toLocaleDateString('en-GB', options);
   };

@@ -13,8 +13,9 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation}: { navigation: any }) => {
   const Array = [
     {
       image: require('../../src/assets/images/Allah.png'),
@@ -38,7 +39,7 @@ const HomeScreen = ({navigation}) => {
     },
   ];
 
- const Dua = [
+ const Dua: Dua[] = [
     {
       dua: 'وَلاَ أَخْشىٰ إِلاَّ عَدْلَهُ',
       meening:
@@ -264,9 +265,7 @@ const HomeScreen = ({navigation}) => {
   ];
 
 
-const getNextPrayerTime = useSelector((state) => state?.user?.nextPrayer);
-
-console.log('getNextPrayerTime',getNextPrayerTime);
+const getNextPrayerTime = useSelector((state:any) => state?.user?.nextPrayer);
 
 
     const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();

@@ -1,19 +1,35 @@
-import React, {useEffect} from 'react';
-import {Image, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { Image, View, StyleSheet } from 'react-native';
 
-const Splash = ({navigation}) => {
+const Splash: React.FC<SplashProps> = ({ navigation }) => {
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       navigation.navigate('bottom');
     }, 3000);
-  }, []);
+
+    return () => clearTimeout(timeout); 
+  }, [navigation]);
+
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <View style={styles.container}>
       <Image
-        style={{width: 200, height: 200}}
+        style={styles.logo}
         source={require('../../src/assets/images/Logo.png')}
       />
     </View>
   );
 };
+
 export default Splash;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 200,
+    height: 200,
+  },
+});

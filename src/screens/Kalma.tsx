@@ -6,7 +6,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-const KalmaScreen = ({navigation}) => {
+const KalmaScreen: React.FC <RamadanScreenProps>= ({navigation}) => {
   const Kalmas = [
     {
       name: '1- First Kalima (Tayyab):',
@@ -99,5 +99,6 @@ const styles = StyleSheet.create({
   },
   meaning: {
     fontSize: 15,
+    color:'#000'
   },
 });

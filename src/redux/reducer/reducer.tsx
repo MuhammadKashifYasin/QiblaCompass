@@ -1,11 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-interface State {
-  nextPrayer: null;
-}
-
 const initialState: State = {
   nextPrayer: null,
+  selectedZiker:null
 };
 
 const userSlice = createSlice({
@@ -15,8 +12,11 @@ const userSlice = createSlice({
     setNextPrayerTime: (state, action) => {
       state.nextPrayer = action.payload;
     },
+    setSelectedZiker:(state,action)=> {
+      state.selectedZiker = action.payload
+    }
   },
 });
 
-export const { setNextPrayerTime } = userSlice.actions;
-export default userSlice.reducer; // Default export the reducer
+export const { setNextPrayerTime, setSelectedZiker } = userSlice.actions;
+export default userSlice.reducer; 

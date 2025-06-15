@@ -6,7 +6,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-const AllahNames = ({navigation}) => {
+const AllahNames: React.FC <RamadanScreenProps> = ({navigation}) => {
   const AllahNames = [
     {
       id: 1,
@@ -651,5 +651,6 @@ const styles = StyleSheet.create({
   },
   meaning: {
     fontSize: 15,
+    color:'#000'
   },
 });
